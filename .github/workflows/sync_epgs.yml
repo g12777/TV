@@ -1,0 +1,96 @@
+name: Sync EPG Files
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    # GitHub Actions 使用 UTC 时间
+    - cron: '40 16 * * *'  # 00:40 CST
+    - cron: '15 2 * * *'   # 10:15 CST
+    - cron: '0 7 * * *'    # 15:00 CST
+  workflow_dispatch:
+
+# 🔑 限制同一时间只有一个 workflow 运行
+concurrency:
+  group: sync-push
+  cancel-in-progress: false
+
+jobs:
+  sync-epg:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 允许写入仓库
+    timeout-minutes: 30   # 整个 job 最多运行 30 分钟
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download EPG files
+        run: |
+          mkdir -p epg
+
+          download() {
+            url="$1"
+            output="$2"
+            retries=5
+            delay=10
+            count=0
+            success=0
+
+            while [ $count -lt $retries ]; do
+              echo "⬇️ [尝试 $((count+1))/$retries] 下载 $url ..."
+              if curl -sS --fail \
+                        --retry 3 \
+                        --retry-delay 5 \
+                        -C - \
+                        --connect-timeout 15 \
+                        --max-time 120 \
+                        "$url" -o "$output"; then
+                if [ -s "$output" ]; then
+                  echo "✅ 成功下载 $url"
+                  success=1
+                  break
+                else
+                  echo "⚠️ 下载到空文件，重试..."
+                fi
+              else
+                echo "❌ 下载失败：$url"
+              fi
+              count=$((count+1))
+              sleep $delay
+            done
+
+            if [ $success -eq 0 ]; then
+              echo "🚨 多次重试失败，跳过：$url"
+              echo "<error>failed to download $url</error>" > "$output"
+            fi
+          }
+
+          # 下载列表
+          download http://e.erw.cc/all.xml epg/all.xml
+          download http://e.erw.cc/e.xml epg/e.xml
+          download https://epg.112114.xyz/pp.xml epg/112114.xml
+          download https://epg.51zmt.top:8001/e.xml epg/51zmt.xml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add epg/all.xml epg/e.xml epg/112114.xml epg/51zmt.xml
+          if git diff --cached --quiet; then
+            echo "没有变更需要提交"
+            exit 0
+          fi
+
+          git commit -m "Sync epg.xml from remote"
+
+          # 🔑 拉取远程最新 commit，避免 fast-forward 被拒绝
+          git fetch origin main
+          git rebase origin/main
+
+          git push

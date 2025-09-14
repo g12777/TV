@@ -1,0 +1,77 @@
+name: Sync Logos
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# 🔑 限制同一时间只有一个 workflow 运行
+concurrency:
+  group: sync-push
+  cancel-in-progress: false
+
+jobs:
+  sync-logos:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 允许写入代码库
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find duplicate PNG filenames
+        run: |
+          echo "检查重复文件..."
+          find assets/logos -type f -name "*.png" -printf "%f %p\n" | \
+          awk '{count[$1]++; paths[$1]=paths[$1]"\n"$2} END {for (f in count) if (count[f]>1) {print "重复文件:" f paths[f]}}'
+
+      - name: Sync PNG files (flatten into logo/, with special copies)
+        run: |
+          mkdir -p logo
+          rm -rf tmp-logos && mkdir tmp-logos
+
+          # 定义需要额外复制的目录列表
+          SPECIAL_DIRS=("NEWTV" "SITV" "IHOT" "IPTV")
+
+          # 遍历所有 PNG 文件
+          find assets/logos -type f -name "*.png" | while read filepath; do
+            filename=$(basename "$filepath")
+            dirname=$(basename "$(dirname "$filepath")")
+
+            # 平铺复制
+            cp "$filepath" "tmp-logos/$filename"
+
+            # 如果所在文件夹在特殊列表里，额外复制一份
+            for d in "${SPECIAL_DIRS[@]}"; do
+              if [[ "$dirname" == "$d" ]]; then
+                cp "$filepath" "tmp-logos/${d}${filename}"
+              fi
+            done
+          done
+
+          # 用 rsync 同步到 logo 文件夹，保证新增/替换/删除
+          rsync -av --delete tmp-logos/ logo/
+          rm -rf tmp-logos
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add logo
+          if git diff --cached --quiet; then
+            echo "没有变更需要提交"
+            exit 0
+          fi
+
+          git commit -m "Sync logo folder with flattened"
+
+          # 🔑 拉取远程最新 commit，避免 fast-forward 被拒绝
+          git fetch origin main
+          git rebase origin/main
+          
+          git push
