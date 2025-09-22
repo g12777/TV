@@ -43,12 +43,7 @@ jobs:
 
             while [ $count -lt $retries ]; do
               echo "⬇️ [尝试 $((count+1))/$retries] 下载 $url ..."
-              if curl -sS --fail \
-                        --retry 3 \
-                        --retry-delay 5 \
-                        -C - \
-                        --connect-timeout 15 \
-                        --max-time 120 \
+              if curl --retry 3 \
                         "$url" -o "$output"; then
                 if [ -s "$output" ]; then
                   echo "✅ 成功下载 $url"
@@ -74,23 +69,23 @@ jobs:
           download http://e.erw.cc/all.xml epg/all.xml
           download http://e.erw.cc/e.xml epg/e.xml
           download https://epg.112114.xyz/pp.xml epg/112114.xml
-          download https://epg.51zmt.top:8001/e.xml epg/51zmt.xml
 
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add epg/all.xml epg/e.xml epg/112114.xml epg/51zmt.xml
-          if git diff --cached --quiet; then
-            echo "没有变更需要提交"
-            exit 0
+          git add epg/*
+          if ! git diff --cached --quiet; then
+            now_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+            git commit -m "更新时间：$now_time"
+
+            # 🔑 拉取远程最新 commit，避免 fast-forward 被拒绝
+            git fetch origin main
+            git rebase origin/main
+
+            git push origin main || echo "推送到GitHub失败"
+          else
+            echo "没有文件可提交"
           fi
 
-          git commit -m "Sync epg.xml from remote"
-
-          # 🔑 拉取远程最新 commit，避免 fast-forward 被拒绝
-          git fetch origin main
-          git rebase origin/main
-
-          git push

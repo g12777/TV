@@ -68,7 +68,8 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Sync logo folder with flattened"
+          now_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          git commit -m "更新时间：$now_time"
 
           # 🔑 拉取远程最新 commit，避免 fast-forward 被拒绝
           git fetch origin main

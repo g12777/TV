@@ -20,7 +20,3 @@ https://tvsilo.vip/epg/all.xml
 ```
 https://tvsilo.vip/epg/112114.xml
 ```
-**[51zmt](http://epg.51zmt.top:8000/)**
-```
-https://tvsilo.vip/epg/51zmt.xml
-```
