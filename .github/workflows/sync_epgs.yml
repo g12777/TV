@@ -11,7 +11,6 @@ on:
     - cron: '0 7 * * *'    # 15:00 CST
   workflow_dispatch:
 
-# 🔑 限制同一时间只有一个 workflow 运行
 concurrency:
   group: sync-push
   cancel-in-progress: false
@@ -20,8 +19,8 @@ jobs:
   sync-epg:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # 允许写入仓库
-    timeout-minutes: 30   # 整个 job 最多运行 30 分钟
+      contents: write
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -43,8 +42,7 @@ jobs:
 
             while [ $count -lt $retries ]; do
               echo "⬇️ [尝试 $((count+1))/$retries] 下载 $url ..."
-              if curl --retry 3 \
-                        "$url" -o "$output"; then
+              if curl --retry 3 "$url" -o "$output"; then
                 if [ -s "$output" ]; then
                   echo "✅ 成功下载 $url"
                   success=1
@@ -66,9 +64,16 @@ jobs:
           }
 
           # 下载列表
-          download http://e.erw.cc/all.xml epg/all.xml
           download http://e.erw.cc/e.xml epg/e.xml
+          download http://e.erw.cc/all.xml epg/all.xml
+          download https://raw.githubusercontent.com/plsy1/epg/main/e/e.xml epg/plsy1_1d.xml
+          download https://raw.githubusercontent.com/plsy1/epg/main/e/seven-days.xml epg/plsy1_7d.xml
           download https://epg.112114.xyz/pp.xml epg/112114.xml
+
+      - name: Merge EPG files
+        run: |
+          echo "▶️ 执行 Python 脚本合并 EPG"
+          python3 scripts/merge_epg.py
 
       - name: Commit and push changes
         run: |
@@ -80,7 +85,6 @@ jobs:
             now_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
             git commit -m "更新时间：$now_time"
 
-            # 🔑 拉取远程最新 commit，避免 fast-forward 被拒绝
             git fetch origin main
             git rebase origin/main
 
@@ -89,3 +93,35 @@ jobs:
             echo "没有文件可提交"
           fi
 
+      - name: Copy file tvsilo
+        if: env.SKIP_BUILD != 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER1_HOST }}
+          username: ${{ secrets.SERVER1_USER }}
+          key: ${{ secrets.SERVER1_SSH_KEY }}
+          source: "epg/*"
+          target: "/www/wwwroot/tvsilo.vip/epg/"
+          strip_components: 1
+          overwrite: true
+
+      - name: Purge cache
+        run: |
+          echo "▶️ 开始刷新缓存"
+          urls=(
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/e.xml"
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/all.xml"
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/112114.xml"
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/plsy1_1d.xml"
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/plsy1_7d.xml"
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/1d.xml"
+            "https://purge.jsdelivr.net/gh/g12777/TV/epg/7d.xml"
+            "https://tvsilo.vip/app/epg.php"
+          )
+
+          for url in "${urls[@]}"; do
+            echo "🔄 刷新：$url"
+            curl -s -X GET "$url" || echo "⚠️ 刷新失败：$url"
+          done
+
+          echo "✅ 缓存刷新完成"
