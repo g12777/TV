@@ -1,9 +1,6 @@
 name: Sync EPG Files
 
 on:
-  push:
-    branches:
-      - main
   schedule:
     # GitHub Actions 使用 UTC 时间
     - cron: '40 16 * * *'  # 00:40 CST
@@ -116,7 +113,7 @@ jobs:
             "https://purge.jsdelivr.net/gh/g12777/TV/epg/plsy1_7d.xml"
             "https://purge.jsdelivr.net/gh/g12777/TV/epg/1d.xml"
             "https://purge.jsdelivr.net/gh/g12777/TV/epg/7d.xml"
-            "https://tvsilo.vip/app/epg.php"
+            "https://tvsilo.vip/app/cache.php?id=epg"
           )
 
           for url in "${urls[@]}"; do

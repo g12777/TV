@@ -1,0 +1,85 @@
+name: Sync M3U Files
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 16 * * *'   # 北京时间 00:00
+    - cron: '0 22 * * *'   # 北京时间 06:00
+    - cron: '0 4 * * *'    # 北京时间 12:00
+    - cron: '0 10 * * *'   # 北京时间 18:00
+  workflow_dispatch:
+
+concurrency:
+  group: sync-push
+  cancel-in-progress: false
+
+jobs:
+  sync-epg:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download M3U files
+        run: |
+          mkdir -p m3u
+
+          download() {
+            url="$1"
+            output="$2"
+            retries=5
+            delay=10
+            count=0
+            success=0
+
+            while [ $count -lt $retries ]; do
+              echo "⬇️ [尝试 $((count+1))/$retries] 下载 $url ..."
+              if curl --retry 3 "$url" -o "$output"; then
+                if [ -s "$output" ]; then
+                  echo "✅ 成功下载 $url"
+                  success=1
+                  break
+                else
+                  echo "⚠️ 下载到空文件，重试..."
+                fi
+              else
+                echo "❌ 下载失败：$url"
+              fi
+              count=$((count+1))
+              sleep $delay
+            done
+
+            if [ $success -eq 0 ]; then
+              echo "🚨 多次重试失败，跳过：$url"
+              echo "<error>failed to download $url</error>" > "$output"
+            fi
+          }
+
+          # 下载列表
+          download https://tvsilo.vip/app/basem3u.json m3u/basem3u.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add m3u/*
+          if ! git diff --cached --quiet; then
+            now_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+            git commit -m "更新时间：$now_time"
+
+            git fetch origin main
+            git rebase origin/main
+
+            git push origin main || echo "推送到GitHub失败"
+          else
+            echo "没有文件可提交"
+          fi
