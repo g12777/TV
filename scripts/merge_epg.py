@@ -5,6 +5,7 @@
  - 合并 channel，按 display-name 去重并补充缺少的名称
  - 每个 <channel> 标签后紧跟属于它的 <programme>
  - 后续文件新增 channel id 在基底文件最大 id 基础上累加
+ - 相同频道（相同 display-name）仅保留第一次出现的节目
  - 美化输出 XML
 """
 
@@ -20,6 +21,7 @@ MERGES = [
     ("epg/7d.xml", ["epg/all.xml", "epg/plsy1_7d.xml"]),
 ]
 
+
 def parse_tree(path: str):
     if not os.path.exists(path):
         print(f"⚠️ 文件不存在: {path}")
@@ -30,13 +32,16 @@ def parse_tree(path: str):
         print(f"⚠️ 解析失败 {path}: {e}")
         return None
 
+
 def get_all_names(ch: ET.Element) -> set[str]:
     return {dn.text.strip() for dn in ch.findall("display-name") if dn.text}
+
 
 def clean_text(s: str) -> str:
     if not s:
         return s
     return re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F]', '', s)
+
 
 def remove_whitespace_nodes(elem):
     for child in list(elem):
@@ -46,11 +51,13 @@ def remove_whitespace_nodes(elem):
             child.tail = clean_text(child.tail.strip())
         remove_whitespace_nodes(child)
 
+
 def prettify_xml(elem: ET.Element) -> bytes:
     remove_whitespace_nodes(elem)
     rough_string = ET.tostring(elem, encoding='utf-8').decode('utf-8')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ", encoding="utf-8", newl="\n")
+
 
 def merge_files(output_file: str, input_files: list[str]):
     print(f"▶️ 合并: {input_files} -> {output_file}")
@@ -61,6 +68,7 @@ def merge_files(output_file: str, input_files: list[str]):
     id_map = {}          # 原 id -> 新 id
     max_id = 0
     programmes_map = {}  # 新 id -> programme 列表
+    used_channels = set()  # 已经保留节目内容的频道 id
 
     for idx, f in enumerate(input_files):
         tree = parse_tree(f)
@@ -98,6 +106,7 @@ def merge_files(output_file: str, input_files: list[str]):
                 ch_id = p.get("channel")
                 if ch_id in programmes_map:
                     programmes_map[ch_id].append(p)
+                    used_channels.add(ch_id)  # 标记为已合并节目
             for p in base_root.findall("programme"):
                 base_root.remove(p)
             continue
@@ -138,17 +147,26 @@ def merge_files(output_file: str, input_files: list[str]):
             # 用原 id 映射到新 id
             id_map[old_id] = new_id
 
-        # 合并 programme
+        # 合并 programme（相同 name 的频道只保留第一次出现的节目）
         for p in root.findall("programme"):
             old_ch_id = p.get("channel")
             new_ch_id = id_map.get(old_ch_id)
             if not new_ch_id:
                 print(f"⚠️ 找不到对应频道：{old_ch_id}")
                 continue
+
+            # 如果该频道的节目已经合并过，跳过
+            if new_ch_id in used_channels:
+                continue
+
             p.set("channel", new_ch_id)
             if new_ch_id not in programmes_map:
                 programmes_map[new_ch_id] = []
             programmes_map[new_ch_id].append(p)
+
+        # 这一轮所有的节目合并完后，标记频道已处理
+        for cid in id_map.values():
+            used_channels.add(cid)
 
     # 调整顺序：每个 <channel> 后紧跟属于它的 <programme>
     # 先移除所有 programme
@@ -172,9 +190,11 @@ def merge_files(output_file: str, input_files: list[str]):
     else:
         print(f"⚠️ 未生成文件: {output_file}")
 
+
 def main():
     for out_file, ins in MERGES:
         merge_files(out_file, ins)
+
 
 if __name__ == "__main__":
     main()
