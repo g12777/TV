@@ -102,6 +102,30 @@ jobs:
           strip_components: 1
           overwrite: true
 
+      - name: Copy file la_tvsilo
+        if: env.SKIP_BUILD != 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER2_HOST }}
+          username: ${{ secrets.SERVER2_USER }}
+          key: ${{ secrets.SERVER2_SSH_KEY }}
+          source: "epg/*"
+          target: "/www/wwwroot/la.dnsab.cc/epg/"
+          strip_components: 1
+          overwrite: true
+
+      - name: Copy file ch_tvsilo
+        if: env.SKIP_BUILD != 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER3_HOST }}
+          username: ${{ secrets.SERVER3_USER }}
+          key: ${{ secrets.SERVER3_SSH_KEY }}
+          source: "epg/*"
+          target: "/www/wwwroot/ch.dnsab.cc/epg/"
+          strip_components: 1
+          overwrite: true
+
       - name: Purge cache
         run: |
           echo "▶️ 开始刷新缓存"

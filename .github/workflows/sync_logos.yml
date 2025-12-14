@@ -76,3 +76,39 @@ jobs:
           git rebase origin/main
           
           git push
+      
+      - name: Copy file tvsilo
+        if: env.SKIP_BUILD != 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER1_HOST }}
+          username: ${{ secrets.SERVER1_USER }}
+          key: ${{ secrets.SERVER1_SSH_KEY }}
+          source: "logo/*"
+          target: "/www/wwwroot/tvsilo.vip/logo/"
+          strip_components: 1
+          overwrite: true
+
+      - name: Copy file la_tvsilo
+        if: env.SKIP_BUILD != 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER2_HOST }}
+          username: ${{ secrets.SERVER2_USER }}
+          key: ${{ secrets.SERVER2_SSH_KEY }}
+          source: "logo/*"
+          target: "/www/wwwroot/la.dnsab.cc/logo/"
+          strip_components: 1
+          overwrite: true
+
+      - name: Copy file ch_tvsilo
+        if: env.SKIP_BUILD != 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER3_HOST }}
+          username: ${{ secrets.SERVER3_USER }}
+          key: ${{ secrets.SERVER3_SSH_KEY }}
+          source: "logo/*"
+          target: "/www/wwwroot/ch.dnsab.cc/logo/"
+          strip_components: 1
+          overwrite: true

@@ -1,0 +1,19 @@
+# 编译缓存目录
+/build/
+
+# VSCode 编辑器配置
+.vscode/
+.idea/
+*.code-workspace
+
+# OS 文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+
+# 临时文件
+GitHub.md
+*.tmp
+*.swp
