@@ -39,11 +39,23 @@ jobs:
 
             while [ $count -lt $retries ]; do
               echo "⬇️ [尝试 $((count+1))/$retries] 下载 $url ..."
-              if curl --retry 3 "$url" -o "$output"; then
-                if [ -s "$output" ]; then
-                  echo "✅ 成功下载 $url"
-                  success=1
-                  break
+              if curl --retry 3 -L "$url" -o "$output.tmp"; then
+                if [ -s "$output.tmp" ]; then
+                  if [[ "$url" == *.gz ]]; then
+                    if gzip -t "$output.tmp" 2>/dev/null; then
+                      gzip -dc "$output.tmp" > "$output"
+                      echo "✅ 成功下载并解压 $url"
+                      success=1
+                      break
+                    else
+                      echo "⚠️ 下载的文件不是有效的 gzip 格式，重试..."
+                    fi
+                  else
+                    mv "$output.tmp" "$output"
+                    echo "✅ 成功下载 $url"
+                    success=1
+                    break
+                  fi
                 else
                   echo "⚠️ 下载到空文件，重试..."
                 fi
@@ -54,6 +66,8 @@ jobs:
               sleep $delay
             done
 
+            rm -f "$output.tmp"
+
             if [ $success -eq 0 ]; then
               echo "🚨 多次重试失败，跳过：$url"
               echo "<error>failed to download $url</error>" > "$output"
@@ -61,8 +75,8 @@ jobs:
           }
 
           # 下载列表
-          download http://e.erw.cc/e.xml epg/e.xml
-          download http://e.erw.cc/all.xml epg/all.xml
+          download http://e.erw.cc/e.xml.gz epg/e.xml
+          download http://e.erw.cc/all.xml.gz epg/all.xml
           download https://raw.githubusercontent.com/plsy1/epg/main/e/e.xml epg/plsy1_1d.xml
           download https://raw.githubusercontent.com/plsy1/epg/main/e/seven-days.xml epg/plsy1_7d.xml
           download https://epg.112114.xyz/pp.xml epg/112114.xml
