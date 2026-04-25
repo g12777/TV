@@ -75,11 +75,11 @@ jobs:
           }
 
           # 下载列表
-          download http://e.erw.cc/e.xml.gz epg/e.xml
-          download http://e.erw.cc/all.xml.gz epg/all.xml
-          download https://raw.githubusercontent.com/plsy1/epg/main/e/e.xml epg/plsy1_1d.xml
-          download https://raw.githubusercontent.com/plsy1/epg/main/e/seven-days.xml epg/plsy1_7d.xml
-          download https://epg.112114.xyz/pp.xml epg/112114.xml
+          download https://raw.githubusercontent.com/kuke31/xmlgz/main/e.xml.gz epg/e.xml
+          download https://raw.githubusercontent.com/kuke31/xmlgz/main/all.xml.gz epg/all.xml
+          # download https://raw.githubusercontent.com/plsy1/epg/main/e/e.xml epg/plsy1_1d.xml
+          download https://raw.githubusercontent.com/plsy1/epg/main/e/seven-days.xml.gz epg/plsy1_7d.xml
+          # download https://epg.112114.xyz/pp.xml epg/112114.xml
 
       - name: Merge EPG files
         run: |
@@ -113,30 +113,6 @@ jobs:
           key: ${{ secrets.SERVER1_SSH_KEY }}
           source: "epg/*"
           target: "/www/wwwroot/tvsilo.vip/epg/"
-          strip_components: 1
-          overwrite: true
-
-      - name: Copy file la_tvsilo
-        if: env.SKIP_BUILD != 'true'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER2_HOST }}
-          username: ${{ secrets.SERVER2_USER }}
-          key: ${{ secrets.SERVER2_SSH_KEY }}
-          source: "epg/*"
-          target: "/www/wwwroot/la.dnsab.cc/epg/"
-          strip_components: 1
-          overwrite: true
-
-      - name: Copy file ch_tvsilo
-        if: env.SKIP_BUILD != 'true'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER3_HOST }}
-          username: ${{ secrets.SERVER3_USER }}
-          key: ${{ secrets.SERVER3_SSH_KEY }}
-          source: "epg/*"
-          target: "/www/wwwroot/ch.dnsab.cc/epg/"
           strip_components: 1
           overwrite: true
 

@@ -17,7 +17,7 @@ import re
 
 # 合并任务定义
 MERGES = [
-    ("epg/1d.xml", ["epg/e.xml", "epg/plsy1_1d.xml", "epg/112114.xml"]),
+    ("epg/1d.xml", ["epg/e.xml"]),
     ("epg/7d.xml", ["epg/all.xml", "epg/plsy1_7d.xml"]),
 ]
 

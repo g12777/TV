@@ -84,26 +84,3 @@ jobs:
             echo "没有文件可提交"
           fi
 
-      - name: Copy file la_tvsilo
-        if: env.SKIP_BUILD != 'true'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER2_HOST }}
-          username: ${{ secrets.SERVER2_USER }}
-          key: ${{ secrets.SERVER2_SSH_KEY }}
-          source: "m3u/basem3u.json"
-          target: "/www/wwwroot/la.dnsab.cc/app/"
-          strip_components: 1
-          overwrite: true
-
-      - name: Copy file ch_tvsilo
-        if: env.SKIP_BUILD != 'true'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER3_HOST }}
-          username: ${{ secrets.SERVER3_USER }}
-          key: ${{ secrets.SERVER3_SSH_KEY }}
-          source: "m3u/basem3u.json"
-          target: "/www/wwwroot/ch.dnsab.cc/app/"
-          strip_components: 1
-          overwrite: true
