@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<tv generator-info-name="tvsilo.vip" generator-info-url="https://github.com/g12777/TV" source-info-name="国内EPG需赞助获取，详情查看 https://erw.cc/post-104.html 非赞助用户请移步到 https://github.com/kuke31/xmlgz" date="20261013172103">
+<tv generator-info-name="tvsilo.vip" generator-info-url="https://github.com/g12777/TV" source-info-name="国内EPG需赞助获取，详情查看 https://erw.cc/post-104.html 非赞助用户请移步到 https://github.com/kuke31/xmlgz" date="20261013224654">
   <channel id="1">
     <display-name lang="zh">CCTV1</display-name>
-    <display-name>CCTV1综合</display-name>
     <display-name>CCTV-1</display-name>
+    <display-name>CCTV1综合</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007010200 +0800" channel="1">
     <title lang="zh">开始</title>
@@ -817,8 +817,8 @@
   </programme>
   <channel id="2">
     <display-name lang="zh">CCTV2</display-name>
-    <display-name>CCTV-2</display-name>
     <display-name>CCTV2财经</display-name>
+    <display-name>CCTV-2</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007002000 +0800" channel="2">
     <title lang="zh">中国经济大讲堂</title>
@@ -2194,8 +2194,8 @@
   </programme>
   <channel id="4">
     <display-name lang="zh">CCTV4</display-name>
-    <display-name>CCTV-4</display-name>
     <display-name>CCTV4中文国际</display-name>
+    <display-name>CCTV-4</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007003600 +0800" channel="4">
     <title lang="zh">海之谣(34)</title>
@@ -4638,8 +4638,8 @@
   </programme>
   <channel id="8">
     <display-name lang="zh">CCTV7</display-name>
-    <display-name>CCTV-7</display-name>
     <display-name>CCTV7国防军事</display-name>
+    <display-name>CCTV-7</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007000900 +0800" channel="8">
     <title lang="zh">军事纪实</title>
@@ -6941,8 +6941,8 @@
   </programme>
   <channel id="11">
     <display-name lang="zh">CCTV10</display-name>
-    <display-name>CCTV-10</display-name>
     <display-name>CCTV10科教</display-name>
+    <display-name>CCTV-10</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007004500 +0800" channel="11">
     <title lang="zh">解码科技史</title>
@@ -9005,8 +9005,8 @@
   </programme>
   <channel id="14">
     <display-name lang="zh">CCTV13</display-name>
-    <display-name>CCTV-13</display-name>
     <display-name>CCTV13新闻</display-name>
+    <display-name>CCTV-13</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007010000 +0800" channel="14">
     <title lang="zh">午夜新闻</title>
@@ -9775,8 +9775,8 @@
   </programme>
   <channel id="15">
     <display-name lang="zh">CCTV14</display-name>
-    <display-name>CCTV-14</display-name>
     <display-name>CCTV14少儿</display-name>
+    <display-name>CCTV-14</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007002000 +0800" channel="15">
     <title lang="zh">李双双</title>
@@ -11240,8 +11240,8 @@
   </programme>
   <channel id="18">
     <display-name lang="zh">CCTV17</display-name>
-    <display-name>CCTV17农业农村</display-name>
     <display-name>CCTV-17</display-name>
+    <display-name>CCTV17农业农村</display-name>
   </channel>
   <programme start="20261007000000 +0800" stop="20261007003400 +0800" channel="18">
     <title lang="zh">田野欢歌</title>
