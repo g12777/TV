@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<tv generator-info-name="tvsilo.vip" generator-info-url="https://github.com/g12777/TV" source-info-name="国内EPG需赞助获取，详情查看 https://erw.cc/post-104.html 非赞助用户请移步到 https://github.com/kuke31/xmlgz" date="20261110174214">
+<tv generator-info-name="tvsilo.vip" generator-info-url="https://github.com/g12777/TV" source-info-name="国内EPG需赞助获取，详情查看 https://erw.cc/post-104.html 非赞助用户请移步到 https://github.com/kuke31/xmlgz" date="20261110232408">
   <channel id="1">
     <display-name lang="zh">CCTV1</display-name>
-    <display-name>CCTV-1</display-name>
     <display-name>CCTV1综合</display-name>
+    <display-name>CCTV-1</display-name>
   </channel>
   <programme start="20261104000000 +0800" stop="20261104000300 +0800" channel="1">
     <title lang="zh">开始</title>
@@ -814,8 +814,8 @@
   </programme>
   <channel id="2">
     <display-name lang="zh">CCTV2</display-name>
-    <display-name>CCTV-2</display-name>
     <display-name>CCTV2财经</display-name>
+    <display-name>CCTV-2</display-name>
   </channel>
   <programme start="20261104000000 +0800" stop="20261104000300 +0800" channel="2">
     <title lang="zh">开始</title>
@@ -2218,8 +2218,8 @@
   </programme>
   <channel id="4">
     <display-name lang="zh">CCTV4</display-name>
-    <display-name>CCTV4中文国际</display-name>
     <display-name>CCTV-4</display-name>
+    <display-name>CCTV4中文国际</display-name>
   </channel>
   <programme start="20261104000000 +0800" stop="20261104003600 +0800" channel="4">
     <title lang="zh">开始</title>
@@ -7801,8 +7801,8 @@
   </programme>
   <channel id="12">
     <display-name lang="zh">CCTV11</display-name>
-    <display-name>CCTV-11</display-name>
     <display-name>CCTV11戏曲</display-name>
+    <display-name>CCTV-11</display-name>
   </channel>
   <programme start="20261104000000 +0800" stop="20261104000100 +0800" channel="12">
     <title lang="zh">精彩呈现</title>
@@ -8355,8 +8355,8 @@
   </programme>
   <channel id="13">
     <display-name lang="zh">CCTV12</display-name>
-    <display-name>CCTV12社会与法</display-name>
     <display-name>CCTV-12</display-name>
+    <display-name>CCTV12社会与法</display-name>
   </channel>
   <programme start="20261104000000 +0800" stop="20261104003900 +0800" channel="13">
     <title lang="zh">开始</title>
@@ -11291,8 +11291,8 @@
   </programme>
   <channel id="18">
     <display-name lang="zh">CCTV17</display-name>
-    <display-name>CCTV17农业农村</display-name>
     <display-name>CCTV-17</display-name>
+    <display-name>CCTV17农业农村</display-name>
   </channel>
   <programme start="20261104000000 +0800" stop="20261104002700 +0800" channel="18">
     <title lang="zh">乡土中国</title>
